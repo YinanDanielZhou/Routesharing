@@ -13,7 +13,7 @@ async def connect_to_server(ip, port, car_id):
     ip = "127.0.0.1"
     port = 8765
     car_id = 5
-    url = f"ws://{ip}:{port}/{car_id}"
+    url = f"ws://{ip}:{port}/car/{car_id}"
 
     sample = {"location" : {"x": 1, "y": 1}, "timestamp" : "....."}
 

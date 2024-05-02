@@ -5,7 +5,7 @@ import sys
 import websockets
 import mysql.connector
 
-from server import register_at_coordinator, write_location_to_db
+from server import extract_sample_from_db, register_at_coordinator, write_sample_to_db
 
 connection_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="my_pool",
@@ -20,24 +20,48 @@ def get_connection():
     return connection_pool.get_connection()
 
 
-
-# Define a WebSocket handler function
-async def websocket_handler(websocket, path):
-    # Print a message when a new connection is established
-    print("Client connected")
-    print(path)
-    car_id = int(path[1:])
+async def car_connection_handler(websocket, car_id):
     mysql_connection = get_connection()
 
     try:
         # Continuously handle messages from the client
         async for message in websocket:
-            write_location_to_db(mysql_connection, car_id, message)
+            print("received ", message)
+            write_sample_to_db(mysql_connection, car_id, message)
+        print()
 
     finally:
         # Print a message when the connection is closed
         mysql_connection.close()
-        print("Client disconnected")
+        print("Car disconnected")
+
+
+async def consumer_connection_handler(websocket, car_id):
+    mysql_connection = get_connection()
+
+    try:
+        async for message in websocket:
+            print("Consumer requesting ", message, " samples of car ", car_id)
+            extracted_samples = extract_sample_from_db(mysql_connection, car_id, int(message))
+            for sample in extracted_samples:
+                await websocket.send(sample)
+            await websocket.send("DONE")
+            print("Returned ", len(extracted_samples), " samples of car " , car_id, " to the Consumer.")
+    finally:
+        mysql_connection.close()
+        print("Consumer disconnected")
+
+# Define a WebSocket handler function
+async def websocket_handler(websocket, path):
+    # Print a message when a new connection is established
+    arg_list = path.split('/')
+    if arg_list[1] == 'car':
+        print("Car connected")
+        await car_connection_handler(websocket, arg_list[2])
+    elif arg_list[1] == 'consumer':
+        print("Consumer connected")
+        await consumer_connection_handler(websocket, arg_list[2])
+
 
 # Start the WebSocket server
 async def start_server(port):
