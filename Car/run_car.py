@@ -5,40 +5,58 @@ import sys
 import websockets
 
 
-from car import initialize
+class ServerConnectionsPool:
+    def __init__(self, uris) -> None:
+        self.uris = uris
+        self.connections = []
+        self.current_index = 0
 
-consumer_server_lookup = dict()
+    async def connect_all(self):
+        for uri in self.uris:
+            conn = await websockets.connect(uri)
+            self.connections.append(conn)
 
-async def connect_to_server(ip, port, car_id):
+    async def send_round_robin(self, message):
+        if not self.connections:  # Ensure there are connections available
+            raise Exception("No available WebSocket connections.")
+
+        # Send a message using the current connection
+        await self.connections[self.current_index].send(message)
+
+        # Move to the next connection in the list, wrapping around if necessary
+        self.current_index = (self.current_index + 1) % len(self.connections)
+
+    async def close_all(self):
+        for conn in self.connections:
+            await conn.close()
+            print("closed one")
+        print("closed all")
+
+# Example usage
+async def main():
     ip = "127.0.0.1"
     port = 8765
     car_id = 5
-    url = f"ws://{ip}:{port}/car/{car_id}"
 
-    sample = {"location" : {"x": 1, "y": 1}, "timestamp" : "....."}
+    uris = [f"ws://{ip}:{port}/car/{car_id}" for port in range(port, port+2)]
 
-    # Connect to the WebSocket server
-    async with websockets.connect(url) as websocket:
+    try:
+        ws_pool = ServerConnectionsPool(uris)
+        
+        await ws_pool.connect_all()
 
-        while True:
-            # Send a message to the server
-            sample["location"]['x'] += 1
-            sample["location"]['y'] += 1
+        with open('Car/Car_samples/car_samples_data.txt', 'r') as fileIn:
+            for line in fileIn:
+                await ws_pool.send_round_robin(json.dumps(line.strip()))
+                await asyncio.sleep(3)
 
-            await websocket.send(json.dumps(sample))
+    except KeyboardInterrupt:
+        pass
+    finally:
+        await ws_pool.close_all()
 
-            await asyncio.sleep(3)
-            
-
-
-# initialize(consumer_server_lookup)
-
-# Run the main coroutine
-def shutdown_handler(sig, frame):
-    print("Shutting down car connection to server.")
-    asyncio.get_event_loop().stop()
-    sys.exit(0)
-signal.signal(signal.SIGINT, shutdown_handler)
-signal.signal(signal.SIGTERM, shutdown_handler)
-
-asyncio.run(connect_to_server("IP, need replace", "Port, need replace", "Car_id, need replace"))
+# Run the example
+try: 
+    asyncio.run(main())
+except KeyboardInterrupt:
+    pass

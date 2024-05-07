@@ -3,7 +3,7 @@ import numpy as np
 import requests
 
 COORDINATOR_URL = "http://127.0.0.1:5000"
-PRIVACY_SENSITIVITY = 50
+PRIVACY_SENSITIVITY = 0.002
 PAYMENT_METHOD = "Public Key ...."
 
 def get_consumers_info():
@@ -65,6 +65,8 @@ def register_at_coordinator(consumer_id):
 
 def initialize(consumer_server_lookup):
     chosen_consumers = filter_consumers(get_consumers_info())
+
+    print(chosen_consumers)
 
     for consumer_id in chosen_consumers:
         car_id, servers = register_at_coordinator(consumer_id)

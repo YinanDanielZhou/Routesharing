@@ -5,13 +5,15 @@ import sys
 import websockets
 import mysql.connector
 
-from server import extract_sample_from_db, register_at_coordinator, write_sample_to_db
+from server import extract_sample_from_db, write_sample_to_db
+
+server_number = sys.argv[1]
 
 connection_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="my_pool",
     pool_size=5,
     host='localhost',
-    database='server',
+    database='server' + server_number,
     user='mytestuser',
     password=''
 )
@@ -75,11 +77,6 @@ async def start_server(port):
 
 
 
-# ip = "192.168.0.0"  # get self ip and port
-# port = 10000
-# register_at_coordinator(ip, port)
-
-
 # Run the WebSocket server
 def shutdown_handler(sig, frame):
     # clean up the connection pool after 
@@ -92,7 +89,7 @@ def shutdown_handler(sig, frame):
 signal.signal(signal.SIGINT, shutdown_handler)
 signal.signal(signal.SIGTERM, shutdown_handler)
 
-port = 8765
+port = 8765 + int(server_number)
 asyncio.run(start_server(port))
 
 

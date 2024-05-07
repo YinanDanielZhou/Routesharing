@@ -1,6 +1,5 @@
 import asyncio
 import websockets
-from consumer import register_at_coordinator
 
 async def main():
     ip = "127.0.0.1"
@@ -24,8 +23,6 @@ async def main():
         except websockets.exceptions.ConnectionClosed:
             print("Server closed the conneciton.")
 
-# uncomment below to register
-# register_at_coordinator(1, 5, 3)
 
 # Run the main coroutine
 asyncio.run(main())
