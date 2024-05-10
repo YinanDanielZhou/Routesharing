@@ -30,3 +30,6 @@ CREATE TABLE CarSupplyConsumer (
     FOREIGN KEY(consumer_id) REFERENCES Consumers(id)
 );
 
+CREATE USER 'mytestuser'@'%' IDENTIFIED BY '';
+GRANT ALL PRIVILEGES ON coordinator.* TO 'mytestuser'@'%';
+FLUSH PRIVILEGES;

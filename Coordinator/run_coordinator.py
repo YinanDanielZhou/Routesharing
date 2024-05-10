@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, request
 import mysql.connector
 
@@ -113,16 +114,20 @@ if __name__ == '__main__':
     connection_pool = mysql.connector.pooling.MySQLConnectionPool(
         pool_name="my_pool",
         pool_size=5,
-        host='localhost',
-        database='coordinator',
-        user='mytestuser',
-        password=''
+        # host='127.0.0.1',
+        # database='coordinator',
+        # user='mytestuser',
+        # password=''
+        host=os.getenv('MYSQL_HOST'),
+        user=os.getenv('MYSQL_USER'),
+        password=os.getenv('MYSQL_PASSWORD'),
+        database=os.getenv('MYSQL_DATABASE')
     )
 
     def get_connection():
         return connection_pool.get_connection()
     
-    app.run(debug=True, port = 5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
 
     connection_pool._remove_connections()
 
