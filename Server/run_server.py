@@ -1,22 +1,25 @@
 import asyncio
-import json
+import os
 import signal
 import sys
 import websockets
 import mysql.connector
 
-from server import extract_sample_from_db, write_sample_to_db
-
-server_number = sys.argv[1]
+from server import extract_sample_from_db, register_at_coordinator, write_sample_to_db
 
 connection_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="my_pool",
     pool_size=5,
-    host='localhost',
-    database='server' + server_number,
-    user='mytestuser',
-    password=''
+    # host='127.0.0.1',
+    # database='server',
+    # user='mytestuser',
+    # password=''
+    host=os.getenv('MYSQL_HOST'),
+    user=os.getenv('MYSQL_USER'),
+    password=os.getenv('MYSQL_PASSWORD'),
+    database=os.getenv('MYSQL_DATABASE')
 )
+
 
 def get_connection():
     return connection_pool.get_connection()
@@ -68,7 +71,7 @@ async def websocket_handler(websocket, path):
 # Start the WebSocket server
 async def start_server(port):
     # Create a WebSocket server
-    async with websockets.serve(websocket_handler, "localhost", port):
+    async with websockets.serve(websocket_handler, '0.0.0.0', port):
         # Print a message when the server starts
         print("Server started")
 
@@ -89,7 +92,15 @@ def shutdown_handler(sig, frame):
 signal.signal(signal.SIGINT, shutdown_handler)
 signal.signal(signal.SIGTERM, shutdown_handler)
 
-port = 8765 + int(server_number)
+
+
+COORDINATOR_URL = f"http://{sys.argv[1]}/register/server"
+ip = sys.argv[2]
+port = int(sys.argv[3])
+register_at_coordinator(COORDINATOR_URL, ip, port)
+
+
+port = 8765
 asyncio.run(start_server(port))
 
 

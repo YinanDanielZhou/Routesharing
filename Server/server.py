@@ -1,9 +1,7 @@
 
 import requests
 
-COORDINATOR_URL = "http://127.0.0.1:5000/register/server"
-
-def register_at_coordinator(ip, port):
+def register_at_coordinator(coordinator_url, ip, port):
 
     data = {
         "ip": ip,
@@ -11,7 +9,7 @@ def register_at_coordinator(ip, port):
     }
     print(data)
 
-    response = requests.post(COORDINATOR_URL, json=data)
+    response = requests.post(coordinator_url, json=data)
 
     # Check if the request was successful (status code 200)
     if response.status_code == 201:

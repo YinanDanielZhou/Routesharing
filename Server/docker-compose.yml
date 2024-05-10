@@ -2,9 +2,10 @@ version: '3.8'
 services:
   web:
     build: .
-    image: rs-coordinator-api
+    image: rs-server-ws
+    command: -u run_server.py host.docker.internal:5000 192.168.0.6 10000   # -u is used to diable python stdout buffering
     ports:
-      - "5000:5000"
+      - "8765:8765"
     depends_on:
       db:
         condition: service_healthy
@@ -12,14 +13,14 @@ services:
       FLASK_ENV : development
       MYSQL_ROOT_PASSWORD: root
       MYSQL_HOST: db
-      MYSQL_DATABASE: coordinator
+      MYSQL_DATABASE: server
       MYSQL_USER: mytestuser
       MYSQL_PASSWORD: 
   db:
     image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: coordinator
+      MYSQL_DATABASE: server
       MYSQL_USER: mytestuser
       MYSQL_PASSWORD: 
     healthcheck:
@@ -28,7 +29,7 @@ services:
       timeout: 1s
       retries: 2
     volumes:
-      - ./coordinator_sql_setup.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./server_sql_setup.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
   mysql-data:
