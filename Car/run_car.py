@@ -1,9 +1,7 @@
 import asyncio
 import json
-import signal
-import sys
 import websockets
-
+import time
 
 class ServerConnectionsPool:
     def __init__(self, uris) -> None:
@@ -21,7 +19,10 @@ class ServerConnectionsPool:
             raise Exception("No available WebSocket connections.")
 
         # Send a message using the current connection
+        start = time.perf_counter()
         await self.connections[self.current_index].send(message)
+        end = time.perf_counter()
+        print(f"Write Latency: {round(end- start, 4)} seconds")
 
         # Move to the next connection in the list, wrapping around if necessary
         self.current_index = (self.current_index + 1) % len(self.connections)
@@ -45,7 +46,7 @@ async def main():
         
         await ws_pool.connect_all()
 
-        with open('Car/Car_samples/car_samples_data.txt', 'r') as fileIn:
+        with open('Car_samples/car_samples_data.txt', 'r') as fileIn:
             for line in fileIn:
                 await ws_pool.send_round_robin(json.dumps(line.strip()))
                 await asyncio.sleep(3)
