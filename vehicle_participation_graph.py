@@ -2,17 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
-# Define the function to plot
-# def f(x, y):
-#     return np.sin(x) ** 10 + np.cos(10 + y * x) * np.cos(x)
-
-PRIVACY_SENSITIVITY_RANGE = (0.25, 0.75)
-
-NUM_OF_SERVER = 15
+PRIVACY_SENSITIVITY_RANGE = (0.1, 0.9)
+NUM_OF_SERVER = 25
 NUM_OF_VEHICLES = 100
 
 vehicle_privacy_sensitivity_list = [round(PRIVACY_SENSITIVITY_RANGE[0] + random.random() * (PRIVACY_SENSITIVITY_RANGE[1] - PRIVACY_SENSITIVITY_RANGE[0]), 3) for _ in range (NUM_OF_VEHICLES)]
-
 print(vehicle_privacy_sensitivity_list[0])
 
 
@@ -39,21 +33,33 @@ def calculateJoinPercentation(Z):
     return Z_percentage
 
 # Create grid and calculate Z values
-x = np.linspace(1e-6, 1e-2, 10)    # compensation c1
-y = np.linspace(7.1, 7.4, 10)    # frequency fd
-X, Y = np.meshgrid(x, y)  
+x = np.linspace(6e-4, 2.5e-3, 10)    # compensation c1
+y = np.linspace(11.5, 13.75, 10)    # frequency fd
+X, Y = np.meshgrid(x, y)   # X, Y are 2D array
 
-
-# print(calculateJoinPercentation(7.2, 5e-6))
-
-# Z = calculateJoinPercentation(Y, X)
 
 Z = calculate_consumer_score(Y, X)
 print(Z)
-
 Z_percentage =calculateJoinPercentation(Z)
 print(Z_percentage)
 
 
-plt.contour(X, Y, Z_percentage, colors='black')
+#### Labeled contour plot
+
+# contour = plt.contour(X, Y, Z_percentage, colors='black')
+# plt.clabel(contour, inline=True, fontsize=8, fmt='%1.2f')  # Inline labels with two decimal format
+# plt.title('Vehicle Participation Rate')
+# plt.xlabel('Compensation')
+# plt.ylabel('Frequency of Data Sharing')
+# plt.show()
+
+
+#### Colored contour plot 
+
+levels = np.linspace(0, 1, 11) # Specify contour levels
+contourf = plt.contourf(X, Y, Z_percentage, levels=levels, cmap='viridis')  # Using a color map
+plt.colorbar(contourf)  # Adds a color bar to the side of the plot
+plt.title('Vehicle Participation Rate')
+plt.xlabel('Compensation')
+plt.ylabel('Frequency of Data Sharing')
 plt.show()
