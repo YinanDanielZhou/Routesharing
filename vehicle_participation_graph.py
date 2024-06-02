@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import random
 
 PRIVACY_SENSITIVITY_RANGE = (0.1, 0.9)
-NUM_OF_SERVER = 25
+NUM_OF_SERVER = 5
 NUM_OF_VEHICLES = 100
 
 vehicle_privacy_sensitivity_list = [round(PRIVACY_SENSITIVITY_RANGE[0] + random.random() * (PRIVACY_SENSITIVITY_RANGE[1] - PRIVACY_SENSITIVITY_RANGE[0]), 3) for _ in range (NUM_OF_VEHICLES)]
@@ -33,8 +34,8 @@ def calculateJoinPercentation(Z):
     return Z_percentage
 
 # Create grid and calculate Z values
-x = np.linspace(6e-4, 2.5e-3, 10)    # compensation c1
-y = np.linspace(11.5, 13.75, 10)    # frequency fd
+x = np.linspace(1e-2, 4.25e-2, 10)    # compensation c1
+y = np.linspace(1.75, 4.5, 10)    # frequency fd
 X, Y = np.meshgrid(x, y)   # X, Y are 2D array
 
 
@@ -62,4 +63,11 @@ plt.colorbar(contourf)  # Adds a color bar to the side of the plot
 plt.title('Vehicle Participation Rate')
 plt.xlabel('Compensation')
 plt.ylabel('Frequency of Data Sharing')
+
+# Set up scientific notation for the x-axis
+formatter = ticker.ScalarFormatter(useMathText=True)  # Use mathematical text for scientific notation
+formatter.set_scientific(True)  # Enable scientific notation
+formatter.set_powerlimits((-3, 3))  # Use scientific notation if the exponent is greater than 3 or less than -3
+plt.gca().xaxis.set_major_formatter(formatter)  # Apply the formatter to the x-axis
+
 plt.show()
