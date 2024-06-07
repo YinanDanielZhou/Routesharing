@@ -7,7 +7,6 @@ from collections import defaultdict
 
 cars = defaultdict(str)
 
-
 with open('Car/Car_samples/car_data_piece.sql', 'r') as fileIn:
     # Iterate over each line in the file
     for line in fileIn:
@@ -24,3 +23,11 @@ with open('Car/Car_samples/car_data_piece.sql', 'r') as fileIn:
 for key in cars.keys():
     with open(f"Car/Car_samples/car_{key}_data.txt", 'w') as fileOut:
         fileOut.write(cars[key])
+
+
+
+with open(f"Car/Car_samples/car_ids.txt", 'a') as fileOut_car_ids:
+    for key in cars.keys():
+        fileOut_car_ids.write(key + '\n')
+        with open(f"Car/Car_samples/car_{key}_data.txt", 'w') as fileOut:
+            fileOut.write(cars[key])

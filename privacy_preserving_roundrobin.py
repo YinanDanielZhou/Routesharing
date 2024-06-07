@@ -63,12 +63,16 @@ def calculate_similarity_score(car_id, total_server, compromised_server_list, sh
 total_server = 10
 compromised_server_list = [2] # ints from [0, total_server)
 
-print(calculate_similarity_score('1381', total_server, compromised_server_list, True))
+# print(calculate_similarity_score('1381', total_server, compromised_server_list, True))
 
 
 # # iterate through several cars and compute their average score
-# car_id_list = ['1270', '1273', '1290', '1291', '1294', '1295', '1299', '1300', '1302', '1308', '1378', '1381']
-# score_sum = 0
-# for i in range(len(car_id_list)):
-#     score_sum += calculate_similarity_score(car_id_list[i], total_server, compromised_server_list)
-# print(f"Average Score: {score_sum / len(car_id_list)}")
+car_id_list = []
+with open(f"Car/Car_samples/car_ids.txt", 'r') as fileIn:
+    for car_id in fileIn:
+         car_id_list.append(car_id.strip())
+
+score_sum = 0
+for i in range(len(car_id_list)):
+    score_sum += calculate_similarity_score(car_id_list[i], total_server, compromised_server_list)
+print(f"Average Score: {score_sum / len(car_id_list)}")
