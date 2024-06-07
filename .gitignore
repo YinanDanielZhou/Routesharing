@@ -2,3 +2,6 @@
 
 __pycache__/
 *.pyc
+
+/Car/Car_samples/car_data.sql
+/Car/Car_samples/car_data_piece.sql
