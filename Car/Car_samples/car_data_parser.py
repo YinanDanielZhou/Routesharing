@@ -2,8 +2,13 @@
 # Parse the huge mysql data file downloaded from http://anrg.usc.edu/www/download_files/beijing_trace09.sql
 # copy one line from the file and insert into a car_dat_piece.sql file
 # filter out records with a speed of 0
+from collections import defaultdict
 
-with open('car_data_piece.sql', 'r') as fileIn, open("car_data_output.txt", 'a') as fileOut:
+
+cars = defaultdict(str)
+
+
+with open('Car/Car_samples/car_data_piece.sql', 'r') as fileIn:
     # Iterate over each line in the file
     for line in fileIn:
         data_list = line.split("),(")
@@ -14,6 +19,8 @@ with open('car_data_piece.sql', 'r') as fileIn, open("car_data_output.txt", 'a')
             data = data_string.split(",")
             if data[5] != '0':
                 output_string = "(" + data_string.split(",", 2)[2] + ")\n"
-                fileOut.write(output_string)
-                # print("(" + data_string.split(",", 2)[2] + ")")
-                # print( "INSERT INTO `location` VALUES (" + data_string + ")" )
+                cars[data[1]]+=(output_string)
+
+for key in cars.keys():
+    with open(f"Car/Car_samples/car_{key}_data.txt", 'w') as fileOut:
+        fileOut.write(cars[key])
