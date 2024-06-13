@@ -34,7 +34,8 @@ async def car_connection_handler(websocket, car_id):
             print("received ", message)
             write_sample_to_db(mysql_connection, car_id, message)
         print()
-
+    except Exception as e:
+        print("Car connection handler caught error: " + e)
     finally:
         # Print a message when the connection is closed
         mysql_connection.close()
@@ -52,6 +53,8 @@ async def consumer_connection_handler(websocket, car_id):
                 await websocket.send(sample)
             await websocket.send("DONE")
             print("Returned ", len(extracted_samples), " samples of car " , car_id, " to the Consumer.")
+    except Exception as e:
+        print("Consumer connection handler caught error: " + e)
     finally:
         mysql_connection.close()
         print("Consumer disconnected")
