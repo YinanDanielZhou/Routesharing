@@ -12,6 +12,8 @@ COPY container_init.sh /container_init.sh
 
 EXPOSE 8765
 
+RUN apt-get update && apt-get install -y iproute2
+
 ENTRYPOINT [ "/bin/bash" ]
 
 

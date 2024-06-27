@@ -39,14 +39,14 @@ async def main():
     port = 8765
     car_id = 5
 
-    uris = [f"ws://{ip}:{port}/car/{car_id}" for port in range(port, port+2)]
+    uris = [f"ws://{ip}:{port}/car/{car_id}" for port in range(port, port+1)]
 
     try:
         ws_pool = ServerConnectionsPool(uris)
         
         await ws_pool.connect_all()
-
-        with open('Car_samples/car_samples_data.txt', 'r') as fileIn:
+        print("all servers connected")
+        with open('Car_samples/car_1988_data.txt', 'r') as fileIn:
             for line in fileIn:
                 await ws_pool.send_round_robin(json.dumps(line.strip()))
                 await asyncio.sleep(3)

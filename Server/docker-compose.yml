@@ -3,6 +3,11 @@ services:
   web:
     build: .
     image: rs-server-ws
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: /container_init.sh
     ports:
       - "${HOST_PORT_TO_BIND}:8765"   # port-of-host:port-of-container
