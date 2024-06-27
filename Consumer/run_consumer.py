@@ -52,8 +52,9 @@ async def main():
     ip = "127.0.0.1"
     port = 8765
     car_id = 5
+    server_count = 20 
 
-    uris = [f"ws://{ip}:{port}/consumer/{car_id}" for port in range(port, port+2)]
+    uris = [f"ws://{ip}:{port}/consumer/{car_id}" for port in range(port, port + server_count)]
 
     try:
         ws_pool = ServerConnectionsPool(uris)

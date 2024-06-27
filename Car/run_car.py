@@ -38,8 +38,9 @@ async def main():
     ip = "127.0.0.1"
     port = 8765
     car_id = 5
+    server_count = 20 
 
-    uris = [f"ws://{ip}:{port}/car/{car_id}" for port in range(port, port+1)]
+    uris = [f"ws://{ip}:{port}/car/{car_id}" for port in range(port, port + server_count)]
 
     try:
         ws_pool = ServerConnectionsPool(uris)
@@ -49,7 +50,7 @@ async def main():
         with open('Car_samples/car_1988_data.txt', 'r') as fileIn:
             for line in fileIn:
                 await ws_pool.send_round_robin(json.dumps(line.strip()))
-                await asyncio.sleep(3)
+                # await asyncio.sleep(3)
 
     except KeyboardInterrupt:
         pass
